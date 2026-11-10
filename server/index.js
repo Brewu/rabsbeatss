@@ -1678,7 +1678,7 @@ app.post("/api/admin/notifications/retry", requireAdmin, async (_req, res) => {
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(resolve(root, "dist"), { index: false, maxAge: "1h" }));
-  app.get("/{*path}", (_req, res) => res.sendFile(resolve(root, "dist/index.html")));
+  app.get("*", (_req, res) => res.sendFile(resolve(root, "dist/index.html")));
 }
 
 app.use((error, _req, res, _next) => {
