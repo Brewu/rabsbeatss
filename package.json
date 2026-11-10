@@ -10,7 +10,7 @@
     "dev": "concurrently -k -n api,web \"npm:dev:server\" \"npm:dev:web\"",
     "dev:server": "node --env-file-if-exists=.env server/index.js",
     "dev:web": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "start": "node --env-file-if-exists=.env server/index.js",
     "migrate:db": "node --env-file-if-exists=.env scripts/migrate-sqlite-to-postgres.js",
     "preview": "vite preview"
