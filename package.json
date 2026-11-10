@@ -12,11 +12,13 @@
     "dev:web": "vite",
     "build": "tsc -b && vite build",
     "start": "node --env-file-if-exists=.env server/index.js",
+    "migrate:db": "node --env-file-if-exists=.env scripts/migrate-sqlite-to-postgres.js",
     "preview": "vite preview"
   },
   "dependencies": {
     "express": "^5.3.0",
     "nodemailer": "^10.4.0",
+    "pg": "^8.23.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "web-push": "^4.0.0",

@@ -39,9 +39,13 @@ Clients can create an account or sign in with email and password under **Account
 
 No email messages are sent unless the corresponding provider environment variables are configured. Push alerts are sent only to browsers that explicitly subscribe. Email delivery failures are recorded in the notification outbox and do not change a verified payment or booking.
 
-## Production
+## Render hosting
 
-Build the frontend with `npm run build`, then run `npm start` with production environment variables. The Express server serves `dist` and the API from the same origin. Use HTTPS, a persistent writable disk/volume for SQLite, backups, and your hosting provider's secret manager. For multi-instance deployments, replace the local SQLite database with a shared transactional database before accepting live bookings.
+The project includes a Render Blueprint for a Free web service. It builds with `npm ci && npm run build`, serves the frontend and API from one origin, and checks `/api/health`. Free web services sleep after inactivity and can take time to wake; this can delay checkout, even though payments are enabled when production and public HTTPS are configured.
+
+Use Neon PostgreSQL for persistent orders, bookings, accounts, catalog, and delivery data. Create a Neon database, connect this private repository in Render, and provide its connection string as the Render `DATABASE_URL` secret. The service must start once to create the schema before importing existing data. Configure `SESSION_SECRET` to the same value as the current local `.env` so encrypted delivery links and passwords remain readable; also set `ADMIN_PASSWORD` and the live `PAYSTACK_SECRET_KEY` in Render's environment, never in the repository. `APP_URL` can be set to the Render HTTPS URL; otherwise the server uses Render's `RENDER_EXTERNAL_URL`. Register `https://YOUR_RENDER_URL/api/paystack/webhook` in Paystack.
+
+To preserve existing local SQLite records, after the Render service has initialized the Neon schema, add the same Neon connection string to the ignored local `.env` as `DATABASE_URL` and run `npm run migrate:db`. The migration runs locally, copies records only into empty PostgreSQL tables, and refuses to overwrite a populated database. Restart the Render service after migration so its in-memory catalog reloads. Keep `.env` and `data/` private; neither is committed. A fresh local development run without `DATABASE_URL` continues to use SQLite.
 
 ## API outline
 
