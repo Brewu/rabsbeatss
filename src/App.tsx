@@ -98,7 +98,7 @@ const sessionPackages = [
   { name: "Song Mixing Session Only", price: 300, description: "Bring your stems or vocals for a 4-hour mixing session. Recording and beatmaking are not included." },
 ];
 
-const filters = ["All beats", "Afrobeats", "Hip-hop", "R&B", "Trap", "Soul"];
+const baseFilters = ["All beats", "Afrobeats", "Hip-hop", "R&B", "Trap", "Soul"];
 const waveHeights = [15, 23, 34, 18, 30, 43, 22, 38, 17, 28, 46, 26, 34, 17, 41, 24, 32, 19, 44, 27, 35, 18, 29, 42, 22, 34, 16, 39, 25, 32, 19, 45, 28, 36, 20, 31, 43, 24, 33, 17, 40, 26];
 const beatInteractionStorageKey = "rabsbeats:beat-interactions";
 
@@ -415,6 +415,7 @@ async function playConfirmationChime() {
 
 function Storefront({ beats, packs, onAdmin, onAccount, accountSignedIn, paymentMessage, paymentPending, paymentNextSteps, soundPlayed, soundStatus, onPlaySound }: { beats: Beat[]; packs: Pack[]; onAdmin: () => void; onAccount: () => void; accountSignedIn: boolean; paymentMessage: string; paymentPending: boolean; paymentNextSteps: PaymentNextSteps | null; soundPlayed: boolean; soundStatus: string; onPlaySound: () => void }) {
   const [filter, setFilter] = useState("All beats");
+  const filters = useMemo(() => [...baseFilters, ...Array.from(new Set(beats.map((beat) => beat.genre))).filter((genre) => !baseFilters.includes(genre))], [beats]);
   const [playingId, setPlayingId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [packSearch, setPackSearch] = useState("");
