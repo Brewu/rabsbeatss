@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, type ApiAvailabilitySlot, type ApiBooking, type ApiNotification, type ApiPack, type ApiTelegramDelivery, type ClientBeatInteraction, type ClientBooking, type ClientOrder, type PushSubscriptionPayload } from "./api";
 
 type Beat = {
@@ -1441,21 +1441,35 @@ export default function App() {
     return () => window.removeEventListener("hashchange", updateRoute);
   }, []);
 
-  useEffect(() => {
-    let active = true;
-    api.catalog()
+  const refreshCatalog = useCallback(() => {
+    return api.catalog()
       .then(({ beats: catalogBeats, packs: catalogPacks }) => {
-        if (active) {
-          setBeats(catalogBeats);
-          setPacks(catalogPacks);
-          setCatalogError("");
-        }
+        setBeats(catalogBeats);
+        setPacks(catalogPacks);
+        setCatalogError("");
       })
       .catch((error: unknown) => {
-        if (active) setCatalogError(error instanceof Error ? error.message : "Could not load the beat catalog.");
+        setCatalogError(error instanceof Error ? error.message : "Could not load the beat catalog.");
       });
-    return () => { active = false; };
   }, []);
+
+  // Load on mount, whenever the admin view closes, when the tab regains focus, and every 30s.
+  useEffect(() => {
+    void refreshCatalog();
+    const onVisible = () => { if (document.visibilityState === "visible") void refreshCatalog(); };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    const timer = window.setInterval(onVisible, 30000);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+      window.clearInterval(timer);
+    };
+  }, [refreshCatalog]);
+
+  useEffect(() => {
+    if (!adminOpen) void refreshCatalog();
+  }, [adminOpen, refreshCatalog]);
 
   useEffect(() => {
     let active = true;
