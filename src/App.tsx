@@ -55,8 +55,8 @@ const sessionSlots = [
   { id: "afternoon", label: "3:00 PM – 7:00 PM" },
 ];
 
-const formatCedis = (amount: number) =>
-  `GH₵${amount.toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatCedis = (amount: number | null | undefined) =>
+  `GH₵${(Number.isFinite(amount) ? (amount as number) : 0).toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const dateKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
